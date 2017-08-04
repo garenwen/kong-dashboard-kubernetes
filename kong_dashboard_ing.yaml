@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kong-dashboard-ingress
+  namespace: whispircn-dev
+spec:
+  rules:
+  - host: t.api-admin.whispir.cc
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kong-dashboard-admin
+          servicePort: 8030

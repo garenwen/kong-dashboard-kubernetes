@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong-dashboard-admin
+  namespace: whispircn-dev
+spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  ports:
+  - name: kong-dashboard-admin
+    port: 8030
+    targetPort: 8030
+    protocol: TCP
+  selector:
+    app: kong-dashboard
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kong-dashboard
+  namespace: whispircn-dev
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: kong-dashboard
+        app: kong-dashboard
+    spec:
+      containers:
+      - name: kong
+        image: registry.whispir.cc/whispircn/infrastructure/kong-dashboard-kubernetes
+        ports:
+        - name: dashboard
+          containerPort: 8030
+          protocol: TCP
+      imagePullSecrets:
+        - name: registry.whispir.cc

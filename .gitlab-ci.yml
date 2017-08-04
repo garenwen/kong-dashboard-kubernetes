@@ -1,0 +1,29 @@
+stages:
+  - package
+  - deploy
+
+docker-build:
+  stage: package
+  tags:
+  - shell
+  - ubuntu
+  script:
+  - IMAGE="registry.whispir.cc/whispircn/infrastructure/kong-dashboard-kubernetes" make build-image
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.whispir.cc
+  - docker push registry.whispir.cc/whispircn/infrastructure/kong-dashboard-kubernetes
+  only:
+  - master
+
+k8s-deploy:
+  dependencies:
+  - docker-build
+  stage: deploy
+  tags:
+  - shell
+  - ubuntu
+  script:
+  - kubectl apply -f kong_dashboard.yaml
+  - kubectl apply -f kong_dashboard_ing.yaml
+  only:
+  - master
+  when: manual
